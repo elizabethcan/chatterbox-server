@@ -15,11 +15,11 @@ this file and include it in basic-server.js so that it actually works.
 var count = 0;
 
 var obj = {results: [{
-      username: 'Jono',
-      text: 'Do my bidding!',
-      roomname: 'Lobby',
-      objectId: count
-    }]};
+  username: 'Jono',
+  text: 'Do my bidding!',
+  roomname: 'Lobby',
+  objectId: count
+}]};
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -29,11 +29,7 @@ var defaultCorsHeaders = {
 };
 
 var requestHandler = function(request, response) {
-  console.log('request handler ran');
-  var pathname = urlLib.parse(request.url).pathname
-  console.log('parsed url: ' + pathname);
-  var queryParams = urlLib.parse(request.url).query;
-  console.log('query params ' + queryParams);
+  var pathname = urlLib.parse(request.url).pathname;
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -65,16 +61,7 @@ var requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   const { method, url } = request;
-
-  // URL testing
-  // var ourUrl = urlLib.parse(request.url);
-  // console.log('OUR URL!!! ' + ourUrl);
-  // var index = ourUrl.indexOf('?')
-  // var slicedUrl = ourUrl.slice(0, index);
-  // console.log(slicedUrl);
-
-  // addressing Options requests
-  if (request.method === 'OPTIONS'){
+  if (request.method === 'OPTIONS') {
     console.log('request method is option');
     var statusCode = 200;
     response.writeHead(statusCode, headers);
@@ -97,25 +84,17 @@ var requestHandler = function(request, response) {
       console.log('POST 201');
       var body = [];
       request.on('data', (chunk) => {
-        // body.push(chunk.toString());
         body.push(chunk);
-        // obj.results.push(JSON.parse(chunk.toString()));
       }).on('end', () => {
         var statusCode = 201;
         body = Buffer.concat(body).toString();
-
-        var parsedBody = JSON.parse(body)
+        var parsedBody = JSON.parse(body);
         parsedBody.objectId = count;
         count++;
         obj.results.push(parsedBody);
         response.writeHead(statusCode, headers);
-
-        // const responseBody = { headers, method, url, body}
-        // console.log('responsebody: ' + JSON.stringify(responseBody));
-
-        // response.write(JSON.stringify(responseBody));
-        console.log('WHAT ARE YOU DOIUNG '+ JSON.stringify(obj));
-        response.end(JSON.stringify(obj));
+        console.log('WHAT ARE YOU DOIUNG ' + JSON.stringify(obj));
+        response.end();
       });
     } else {
       var statusCode = 404;
@@ -124,10 +103,6 @@ var requestHandler = function(request, response) {
     }
   }
 
-  // response.writeHead(statusCode, headers);
-
-  // var responseTest = JSON.stringify(headers);
-  // console.log(responseTest);
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
   // response.end() will be the body of the response - i.e. what shows
