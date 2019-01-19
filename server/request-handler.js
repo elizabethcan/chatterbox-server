@@ -1,3 +1,4 @@
+var urlLib = require('url');
 /*************************************************************
 
 You should implement your request handler function in this file.
@@ -11,7 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var messagesArr = [];
+
 var obj = {results: []};
 
 var defaultCorsHeaders = {
@@ -23,6 +24,8 @@ var defaultCorsHeaders = {
 
 var requestHandler = function(request, response) {
   console.log('request handler ran');
+  var pathname = urlLib.parse(request.url).pathname
+  console.log('parsed url: ' + pathname);
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -55,8 +58,24 @@ var requestHandler = function(request, response) {
   // which includes the status and all headers.
   const { method, url } = request;
 
+  // URL testing
+  // var ourUrl = urlLib.parse(request.url);
+  // console.log('OUR URL!!! ' + ourUrl);
+  // var index = ourUrl.indexOf('?')
+  // var slicedUrl = ourUrl.slice(0, index);
+  // console.log(slicedUrl);
+
+  // addressing Options requests
+  if (request.method === 'OPTIONS'){
+    console.log('request method is option');
+    var statusCode = 200;
+    response.writeHead(statusCode, headers);
+    response.end('please work');
+  }
+
   if (request.method === 'GET') {
-    if (request.url === '/classes/messages') {
+    if (pathname === '/classes/messages') {
+      console.log('GET 200');
       var statusCode = 200;
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify(obj));
@@ -66,15 +85,17 @@ var requestHandler = function(request, response) {
       response.end('error 404');
     }
   } else if (request.method === 'POST') {
-    if (request.url === '/classes/messages') {
-      // var body = [];
+    if (pathname === '/classes/messages') {
+      console.log('POST 201');
+      var body = [];
       request.on('data', (chunk) => {
         // body.push(chunk.toString());
-        obj.results.push(JSON.parse(chunk.toString()));
+        body.push(chunk);
+        // obj.results.push(JSON.parse(chunk.toString()));
       }).on('end', () => {
-        // body = Buffer.concat(body).toString();
-
         var statusCode = 201;
+        body = Buffer.concat(body).toString();
+        obj.results.push(JSON.parse(body));
         response.writeHead(statusCode, headers);
 
         // const responseBody = { headers, method, url, body}
