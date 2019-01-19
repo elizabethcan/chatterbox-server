@@ -93,8 +93,8 @@ var requestHandler = function(request, response) {
         count++;
         obj.results.push(parsedBody);
         response.writeHead(statusCode, headers);
-        console.log('WHAT ARE YOU DOIUNG ' + JSON.stringify(obj));
-        response.end();
+        // response.end();
+        response.end(JSON.stringify(parsedBody));
       });
     } else {
       var statusCode = 404;
