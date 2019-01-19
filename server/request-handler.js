@@ -11,8 +11,8 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
-var messagesArr = [{username: 'notbobby', text: 'pleaseeeee'}];
-var obj = {results: messagesArr};
+var messagesArr = [];
+var obj = {results: []};
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -53,26 +53,40 @@ var requestHandler = function(request, response) {
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-
+  const { method, url } = request;
 
   if (request.method === 'GET') {
     if (request.url === '/classes/messages') {
       var statusCode = 200;
       response.writeHead(statusCode, headers);
       response.end(JSON.stringify(obj));
+    } else {
+      var statusCode = 404;
+      response.writeHead(statusCode, headers);
+      response.end('error 404');
     }
   } else if (request.method === 'POST') {
     if (request.url === '/classes/messages') {
-      var body = [];
+      // var body = [];
       request.on('data', (chunk) => {
-        body.push(chunk);
-        messagesArr.push(body);
+        // body.push(chunk.toString());
+        obj.results.push(JSON.parse(chunk.toString()));
       }).on('end', () => {
-        body = Buffer.concat(body).toString();
+        // body = Buffer.concat(body).toString();
+
         var statusCode = 201;
         response.writeHead(statusCode, headers);
-        response.end();
+
+        // const responseBody = { headers, method, url, body}
+        // console.log('responsebody: ' + JSON.stringify(responseBody));
+
+        // response.write(JSON.stringify(responseBody));
+        response.end(JSON.stringify(obj));
       });
+    } else {
+      var statusCode = 404;
+      response.writeHead(statusCode, headers);
+      response.end('error 404');
     }
   }
 
