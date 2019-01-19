@@ -29,5 +29,12 @@
     "presets": [
       "es2015"
     ]
+  },
+  "dependencies": {
+    "chai": "^4.1.2",
+    "jquery": "^3.3.1",
+    "mocha": "^5.2.0",
+    "sinon": "^6.3.4",
+    "underscore": "^1.9.1"
   }
 }
