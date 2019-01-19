@@ -12,8 +12,14 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var count = 0;
 
-var obj = {results: []};
+var obj = {results: [{
+      username: 'Jono',
+      text: 'Do my bidding!',
+      roomname: 'Lobby',
+      objectId: count
+    }]};
 
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
@@ -26,6 +32,8 @@ var requestHandler = function(request, response) {
   console.log('request handler ran');
   var pathname = urlLib.parse(request.url).pathname
   console.log('parsed url: ' + pathname);
+  var queryParams = urlLib.parse(request.url).query;
+  console.log('query params ' + queryParams);
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -95,13 +103,18 @@ var requestHandler = function(request, response) {
       }).on('end', () => {
         var statusCode = 201;
         body = Buffer.concat(body).toString();
-        obj.results.push(JSON.parse(body));
+
+        var parsedBody = JSON.parse(body)
+        parsedBody.objectId = count;
+        count++;
+        obj.results.push(parsedBody);
         response.writeHead(statusCode, headers);
 
         // const responseBody = { headers, method, url, body}
         // console.log('responsebody: ' + JSON.stringify(responseBody));
 
         // response.write(JSON.stringify(responseBody));
+        console.log('WHAT ARE YOU DOIUNG '+ JSON.stringify(obj));
         response.end(JSON.stringify(obj));
       });
     } else {
